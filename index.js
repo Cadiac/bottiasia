@@ -33,7 +33,11 @@ app.get('/', (req, res) => {
 })
 
 function hasMoneyFor(item) {
-  return (((100 - item.discountPercent)/100) * item.price) <= player.money
+  if (item){
+    return (((100 - item.discountPercent)/100) * item.price) <= player.money
+  } else {
+    return false
+  }
 }
 
 // server posts this endpoint on every move and this should return the move
@@ -112,7 +116,7 @@ app.post('/move', (req, res, next) => {
     // find new target
     items.forEach((item) => {
       if (targetItem) {
-        if ( targetItem.price < item.price ) {
+        if ( targetItem.price < item.price && hasMoneyFor(item) ) {
           targetItem = item
         }
       } else {
@@ -122,7 +126,7 @@ app.post('/move', (req, res, next) => {
   }
 
   // Do we have money for exiting?
-  if (!hasMoneyFor(targetItem)) {
+  if (targetItem && !hasMoneyFor(targetItem)) {
     console.log("no moneys " + player.money)
     exiting = true
   }
