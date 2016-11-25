@@ -1,0 +1,34 @@
+{
+  "name": "bottiasia",
+  "version": "1.0.0",
+  "description": "Bot for https://github.com/janneri/bots-of-black-friday",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cadiac/bottiasia.git"
+  },
+  "keywords": [
+    "bot",
+    "hackathon",
+    "solita"
+  ],
+  "author": "Cadiac & norpsa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cadiac/bottiasia/issues"
+  },
+  "homepage": "https://github.com/Cadiac/bottiasia#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "morgan": "^1.7.0",
+    "pathfinding": "^0.4.18"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
