@@ -55,7 +55,7 @@ app.post('/move', (req, res, next) => {
         item.position.y === player.position.y &&
         hasMoneyFor(item)){
       res.json('PICK')
-      next()
+      return
     }
   }
 
@@ -145,8 +145,10 @@ app.post('/move', (req, res, next) => {
   }
 
   // TODO: path length
-  direction.x = path[1][0] - path[0][0]
-  direction.y = path[1][1] - path[0][1]
+  if (path.length >= 2){
+    direction.x = path[1][0] - path[0][0]
+    direction.y = path[1][1] - path[0][1]
+  }
 
   let command = 'USE'
 
@@ -163,7 +165,7 @@ app.post('/move', (req, res, next) => {
   console.log(direction)
   console.log(command)
 
-  console.log(path)
+  //console.log(path)
   res.json(command)
 })
 
