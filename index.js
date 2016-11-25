@@ -3,13 +3,14 @@ const morgan = require('morgan')
 const pathfinding = require('pathfinding')
 const apisauce = require('apisauce')
 const bodyParser = require('body-parser')
+const ip = require('ip')
 
 const app = express()
 
 // Config server api here
 const api = apisauce.create({
-  //baseURL: 'http://192.168.1.2:8080',
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://192.168.43.30:8080',
+  //baseURL: 'http://localhost:8080',
 })
 
 let matrix = []
@@ -113,7 +114,8 @@ app.listen(30003, () => {
 // TODO - register should post own IP
 api.post('/register', {
     playerName: "bottiasia",
+    url: "http://" + ip.address() + ":30003/move"
     //url: "http://192.168.1.11:30003/move"
-    url: "http://localhost:30003/move"
+    //url: "http://localhost:30003/move"
   })
   .then(console.log)
