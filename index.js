@@ -14,6 +14,7 @@ const api = apisauce.create({
 })
 
 let matrix = []
+let path = []
 let exit = {
   x: 0,
   y: 0
@@ -42,7 +43,6 @@ function hasMoneyFor(item) {
 
 // server posts this endpoint on every move and this should return the move
 app.post('/move', (req, res, next) => {
-  matrix = []
 
   player = req.body.playerState
   exit = req.body.gameState.map.exit
@@ -59,8 +59,53 @@ app.post('/move', (req, res, next) => {
     }
   }
 
-  // can we shoot
+  //console.log("exit is " + exit)
+  console.log('player is at ' + player.position.x + ',' + player.position.y)
 
+  if (targetItem) {
+    // Does it still exist?
+    let exists = items.some((item) => {
+      return item.position.x === targetItem.position.x && item.position.y === targetItem.position.y
+    })
+
+    // find new target
+    if (!exists) {
+      targetItem = null
+
+      items.forEach((item) => {
+        if (targetItem) {
+          if ( targetItem.discountPercent < item.discountPercent && hasMoneyFor(item) ) {
+            targetItem = item
+          }
+        } else {
+          targetItem = item
+        }
+      })
+    }
+  } else {
+    // find new target
+    items.forEach((item) => {
+      if (targetItem) {
+        if ( targetItem.discountPercent < item.discountPercent && hasMoneyFor(item) ) {
+          targetItem = item
+        }
+      } else {
+        targetItem = item
+      }
+    })
+  }
+
+  // Do we have money or should we just head home?
+  // Are we going to die?
+  if (!hasMoneyFor(targetItem) || player.health < 30) {
+    console.log("no moneys or health " + player.money + "$ " + player.health + "hp")
+    exiting = true
+  }
+
+  path = []
+  matrix = []
+
+  // parse map
   req.body.gameState.map.tiles.forEach((row, y) => {
     let parsedRow = []
     for(let x = 0; x < row.length; ++x) {
@@ -86,52 +131,7 @@ app.post('/move', (req, res, next) => {
     matrix.push(parsedRow)
   })
 
-  //console.log("exit is " + exit)
-  console.log('player is at ' + player.position.x + ',' + player.position.y)
-
   let grid = new pathfinding.Grid(matrix)
-
-  let path = []
-
-  if (targetItem) {
-    // Does it still exist?
-    let exists = items.some((item) => {
-      return item.position.x === targetItem.position.x && item.position.y === targetItem.position.y
-    })
-
-    // find new target
-    if (!exists) {
-      targetItem = null
-
-      items.forEach((item) => {
-        if (targetItem) {
-          if ( targetItem.price < item.price && hasMoneyFor(item) ) {
-            targetItem = item
-          }
-        } else {
-          targetItem = item
-        }
-      })
-    }
-  } else {
-    // find new target
-    items.forEach((item) => {
-      if (targetItem) {
-        if ( targetItem.price < item.price && hasMoneyFor(item) ) {
-          targetItem = item
-        }
-      } else {
-        targetItem = item
-      }
-    })
-  }
-
-  // Do we have money for exiting?
-  // Are we going to die?
-  if (!hasMoneyFor(targetItem) || player.health < 30) {
-    console.log("no moneys or health " + player.money + "$ " + player.health + "hp")
-    exiting = true
-  }
 
   if (!exiting){
     path = finder.findPath(player.position.x, player.position.y, targetItem.position.x, targetItem.position.y, grid)
