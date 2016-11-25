@@ -9,7 +9,7 @@ const app = express()
 
 // Config server api here
 const api = apisauce.create({
-  baseURL: 'http://192.168.43.30:8080',
+  baseURL: 'http://192.168.1.2:8080',
   //baseURL: 'http://localhost:8080',
 })
 
@@ -56,6 +56,7 @@ app.post('/move', (req, res, next) => {
         item.position.y === player.position.y &&
         hasMoneyFor(item)){
       console.log("Picking up item at " + player.position.x + ',' + player.position.y)
+      console.log("PICK")
       res.json('PICK')
       return
     }
@@ -63,6 +64,8 @@ app.post('/move', (req, res, next) => {
 
   // can we shoot
   if (player.usableItems.length > 0){
+    console.log("Lets shoot!")
+    console.log("USE")
     res.json('USE')
     return
   }
@@ -128,7 +131,11 @@ app.post('/move', (req, res, next) => {
           parsedRow.push(1)
           break
         case '#':
-          parsedRow.push(1)
+          // if item is on a trap make the tile walkable
+          let itemOnTrap = items.some((item) => {
+            return item.position.x === x && item.position.y === y
+          })
+          parsedRow.push(itemOnTrap ? 0 : 1)
           break
         case '_':
           parsedRow.push(0)
@@ -198,7 +205,7 @@ app.listen(30003, () => {
 
 // TODO - register should post own IP
 api.post('/register', {
-    playerName: "bottiasia",
+    playerName: "bottiasia2",
     url: "http://" + ip.address() + ":30003/move"
     //url: "http://192.168.1.11:30003/move"
     //url: "http://localhost:30003/move"
