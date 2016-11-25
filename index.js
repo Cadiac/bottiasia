@@ -114,7 +114,9 @@ app.post('/move', (req, res, next) => {
     })
   }
 
-  path = finder.findPath(player.position.x, player.position.y, targetItem.x, targetItem.y, grid)
+  console.log(targetItem)
+
+  path = finder.findPath(player.position.x, player.position.y, targetItem.position.x, targetItem.position.y, grid)
 
   let direction = {
     x: 0,
