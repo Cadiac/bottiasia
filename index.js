@@ -61,6 +61,12 @@ app.post('/move', (req, res, next) => {
     }
   }
 
+  // can we shoot
+  if (player.usableItems.length > 0){
+    res.json('USE')
+    return
+  }
+
   if (targetItem) {
     // Does it still exist?
     let exists = items.some((item) => {
@@ -96,9 +102,17 @@ app.post('/move', (req, res, next) => {
 
   // Do we have money or should we just head home?
   // Are we going to die?
-  if (!hasMoneyFor(targetItem) || player.health < 30) {
-    console.log("no moneys or health " + player.money + "€ " + player.health + "hp")
-    exiting = true
+  if (!hasMoneyFor(targetItem)) {
+    if (player.health < 30) {
+      exiting = true
+      console.log("I'm about to die, lets head home.")
+    } else if (items.length === 0 && player.money > 500){
+      exiting = false
+      console.log("No items on map but I'm not dying yet, lets wait")
+    } else {
+      exiting = true
+      console.log("Lets go home.")
+    }
   }
 
   path = []
