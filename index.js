@@ -19,6 +19,7 @@ let exit = {
 }
 let player = {}
 let items = []
+let targetItem = null
 
 const finder = new pathfinding.AStarFinder()
 
@@ -73,10 +74,46 @@ app.post('/move', (req, res, next) => {
   })
 
   //console.log("exit is " + exit)
+  console.log('player is at ' + player.position.x + ',' + player.position.y)
 
   let grid = new pathfinding.Grid(matrix)
-  const path = finder.findPath(player.position.x, player.position.y, exit.x, exit.y, grid)
-  console.log('player is at ' + player.position.x + ',' + player.position.y)
+
+  let path = []
+
+  if (targetItem) {
+    // Does it still exist?
+    let exists = items.some((item) => {
+      return item.position.x === targetItem.position.x && item.position.y === targetItem.position.y
+    })
+
+    // find new target
+    if (!exists) {
+      targetItem = null
+
+      items.forEach((item) => {
+        if (targetItem) {
+          if ( targetItem.price < item.price ) {
+            targetItem = item
+          }
+        } else {
+          targetItem = item
+        }
+      })
+    }
+  } else {
+    // find new target
+    items.forEach((item) => {
+      if (targetItem) {
+        if ( targetItem.price < item.price ) {
+          targetItem = item
+        }
+      } else {
+        targetItem = item
+      }
+    })
+  }
+
+  path = finder.findPath(player.position.x, player.position.y, targetItem.x, targetItem.y, grid)
 
   let direction = {
     x: 0,
