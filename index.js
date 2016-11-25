@@ -44,6 +44,7 @@ function hasMoneyFor(item) {
 // server posts this endpoint on every move and this should return the move
 app.post('/move', (req, res, next) => {
 
+  exiting = false
   player = req.body.playerState
   exit = req.body.gameState.map.exit
   items = req.body.gameState.items
