@@ -11,13 +11,14 @@ const api = apisauce.create({
   baseURL: 'http://localhost:8080',
 })
 
-let matrix = [
-    [0, 0, 0, 1, 0],
-    [1, 0, 0, 0, 1],
-    [0, 0, 1, 0, 0],
-]
+let matrix = []
 
-let grid = new pathfinding.Grid(matrix)
+let exit = {
+  x: 0,
+  y: 0
+}
+
+let player = {}
 const finder = new pathfinding.AStarFinder()
 
 app.use(morgan('dev'))
@@ -35,9 +36,70 @@ app.get('/move', (req, res) => {
 
 // server posts this endpoint on every move and this should return the move
 app.post('/move', (req, res) => {
-  console.log(req.body.gameState.map.tiles)
-  const path = finder.findPath(1, 2, 4, 2, grid)
-  res.json("DOWN")
+  matrix = []
+
+  player = req.body.playerState
+  exit = req.body.gameState.map.exit
+
+  //console.log(req.body.gameState.map.tiles)
+
+  req.body.gameState.map.tiles.forEach((row, y) => {
+    let parsedRow = []
+    for(let x = 0; x < row.length; ++x) {
+      let column = row.charAt(x)
+      switch (column) {
+        case 'x':
+          parsedRow.push(1)
+          break
+        case '#':
+          parsedRow.push(1)
+          break
+        case '_':
+          parsedRow.push(0)
+          break
+        case 'o':
+          parsedRow.push(0)
+          break
+        default:
+          console.log("apuapua en tiedä mikä tää on " + column)
+          break
+      }
+    }
+    matrix.push(parsedRow)
+  })
+
+  //console.log("exit is " + exit)
+
+  let grid = new pathfinding.Grid(matrix)
+  const path = finder.findPath(player.position.x, player.position.y, exit.x, exit.y, grid)
+  console.log('player is at ' + player.position.x + ',' + player.position.y)
+
+  let direction = {
+    x: 0,
+    y: 0
+  }
+
+  // TODO: path length
+  direction.x = path[1][0] - path[0][0]
+  direction.y = path[1][1] - path[0][1]
+
+  let command = 'USE'
+
+  if (direction.x === 1) {
+    command = 'RIGHT'
+  } else if (direction.x === -1) {
+    command = 'LEFT'
+  } else if (direction.y === 1) {
+    command = 'DOWN'
+  } else if (direction.y === -1) {
+    command = 'UP'
+  }
+
+  console.log(direction)
+  console.log(command)
+
+  console.log(path)
+  res.json(command)
 })
 
 app.listen(30003, () => {
