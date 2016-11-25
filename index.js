@@ -7,10 +7,12 @@ const ip = require('ip')
 
 const app = express()
 
+const serverIp = '192.168.1.2'
+const serverPort = ':8080'
+
 // Config server api here
 const api = apisauce.create({
-  baseURL: 'http://192.168.1.2:8080',
-  //baseURL: 'http://localhost:8080',
+  baseURL: 'http://' + serverIp + serverPort,
 })
 
 let matrix = []
@@ -43,6 +45,12 @@ function hasMoneyFor(item) {
 
 // server posts this endpoint on every move and this should return the move
 app.post('/move', (req, res, next) => {
+  const requestIp = req.headers['x-real-ip'] || req.connection.remoteAddress;
+
+  if (requestIp != ('::ffff:' + serverIp)){
+    console.log("joku huijaa :(")
+    return
+  }
 
   exiting = false
   player = req.body.playerState
@@ -206,9 +214,7 @@ app.listen(30003, () => {
 
 // TODO - register should post own IP
 api.post('/register', {
-    playerName: "bottiasia2",
+    playerName: "bottiasia3",
     url: "http://" + ip.address() + ":30003/move"
-    //url: "http://192.168.1.11:30003/move"
-    //url: "http://localhost:30003/move"
   })
   .then(console.log)
