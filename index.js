@@ -55,13 +55,11 @@ app.post('/move', (req, res, next) => {
     if (item.position.x === player.position.x &&
         item.position.y === player.position.y &&
         hasMoneyFor(item)){
+      console.log("Picking up item at " + player.position.x + ',' + player.position.y)
       res.json('PICK')
       return
     }
   }
-
-  //console.log("exit is " + exit)
-  console.log('player is at ' + player.position.x + ',' + player.position.y)
 
   if (targetItem) {
     // Does it still exist?
@@ -99,7 +97,7 @@ app.post('/move', (req, res, next) => {
   // Do we have money or should we just head home?
   // Are we going to die?
   if (!hasMoneyFor(targetItem) || player.health < 30) {
-    console.log("no moneys or health " + player.money + "$ " + player.health + "hp")
+    console.log("no moneys or health " + player.money + "€ " + player.health + "hp")
     exiting = true
   }
 
@@ -134,11 +132,18 @@ app.post('/move', (req, res, next) => {
 
   let grid = new pathfinding.Grid(matrix)
 
-  if (!exiting){
-    path = finder.findPath(player.position.x, player.position.y, targetItem.position.x, targetItem.position.y, grid)
-  } else {
-    path = finder.findPath(player.position.x, player.position.y, exit.x, exit.y, grid)
+  let target = {
+    x: player.position.x,
+    y: player.position.y
   }
+
+  if (!exiting){
+    target = targetItem.position
+  } else {
+    target = exit
+  }
+
+  path = finder.findPath(player.position.x, player.position.y, target.x, target.y, grid)
 
   let direction = {
     x: 0,
@@ -163,7 +168,10 @@ app.post('/move', (req, res, next) => {
     command = 'UP'
   }
 
-  console.log(direction)
+  console.log('Player: ' + player.position.x + ',' + player.position.y + ' ' + player.health + 'hp ' + player.money + '€')
+  console.log("Exiting: " + exiting)
+  console.log("Direction: " + direction.x + ',' + direction.y)
+  console.log("Target: " + target.x + "," + target.y)
   console.log(command)
 
   //console.log(path)
