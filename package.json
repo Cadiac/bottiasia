@@ -25,6 +25,7 @@
   "homepage": "https://github.com/Cadiac/bottiasia#readme",
   "dependencies": {
     "apisauce": "^0.6.0",
+    "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "morgan": "^1.7.0",
     "pathfinding": "^0.4.18"

@@ -2,6 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const pathfinding = require('pathfinding')
 const apisauce = require('apisauce')
+const bodyParser = require('body-parser')
 
 const app = express()
 
@@ -20,6 +21,7 @@ let grid = new pathfinding.Grid(matrix)
 const finder = new pathfinding.AStarFinder()
 
 app.use(morgan('dev'))
+app.use(bodyParser.json())
 
 app.get('/', (req, res) => {
   res.send('hello, world!')
@@ -33,8 +35,9 @@ app.get('/move', (req, res) => {
 
 // server posts this endpoint on every move and this should return the move
 app.post('/move', (req, res) => {
-  const path = finder.findPath(1, 2, 4, 2, grid);
-  res.json(path)
+  console.log(req.body.gameState.map.tiles)
+  const path = finder.findPath(1, 2, 4, 2, grid)
+  res.json("DOWN")
 })
 
 app.listen(30003, () => {
@@ -44,6 +47,6 @@ app.listen(30003, () => {
 // TODO - register should post own IP
 api.post('/register', {
     playerName: "bottiasia",
-    url: "http://192.168.33.15:30003/move"
+    url: "http://localhost:30003/move"
   })
   .then(console.log)
