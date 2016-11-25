@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 
 function hasMoneyFor(item) {
   if (item){
-    return (((100 - item.discountPercent)/100) * item.price) <= player.money
+    return (((100 - item.discountPercent)/100) * item.price) <= (player.money - 50)
   } else {
     return false
   }
@@ -48,6 +48,7 @@ app.post('/move', (req, res, next) => {
   exit = req.body.gameState.map.exit
   items = req.body.gameState.items
 
+  // can we pick up an item
   for (let i = 0; i < items.length; ++i){
     let item = items[i]
     if (item.position.x === player.position.x &&
@@ -58,7 +59,7 @@ app.post('/move', (req, res, next) => {
     }
   }
 
-  //console.log(req.body.gameState.map.tiles)
+  // can we shoot
 
   req.body.gameState.map.tiles.forEach((row, y) => {
     let parsedRow = []
@@ -126,8 +127,9 @@ app.post('/move', (req, res, next) => {
   }
 
   // Do we have money for exiting?
-  if (targetItem && !hasMoneyFor(targetItem)) {
-    console.log("no moneys " + player.money)
+  // Are we going to die?
+  if (!hasMoneyFor(targetItem) || player.health < 30) {
+    console.log("no moneys or health " + player.money + "$ " + player.health + "hp")
     exiting = true
   }
 
