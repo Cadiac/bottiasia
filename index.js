@@ -46,6 +46,7 @@ app.post('/move', (req, res, next) => {
 
   exiting = false
   player = req.body.playerState
+  players = req.body.gameState.players
   exit = req.body.gameState.map.exit
   items = req.body.gameState.items
 
@@ -62,8 +63,8 @@ app.post('/move', (req, res, next) => {
     }
   }
 
-  // can we shoot
-  if (player.usableItems.length > 0){
+  // can we shoot OTHER players?
+  if (player.usableItems.length > 0 && players.length > 1){
     console.log("Lets shoot!")
     console.log("USE")
     res.json('USE')
