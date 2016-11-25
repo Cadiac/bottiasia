@@ -32,6 +32,10 @@ app.get('/', (req, res) => {
   res.send('hello, world!')
 })
 
+function hasMoneyFor(item) {
+  return (((100 - item.discountPercent)/100) * item.price) <= player.money
+}
+
 // server posts this endpoint on every move and this should return the move
 app.post('/move', (req, res, next) => {
   matrix = []
@@ -44,7 +48,7 @@ app.post('/move', (req, res, next) => {
     let item = items[i]
     if (item.position.x === player.position.x &&
         item.position.y === player.position.y &&
-        item.price <= player.money){
+        hasMoneyFor(item)){
       res.json('PICK')
       next()
     }
@@ -67,7 +71,7 @@ app.post('/move', (req, res, next) => {
           parsedRow.push(0)
           break
         case 'o':
-          parsedRow.push(0)
+          parsedRow.push(exiting ? 0 : 1)
           break
         default:
           console.log("apuapua en tiedä mikä tää on " + column)
@@ -96,7 +100,7 @@ app.post('/move', (req, res, next) => {
 
       items.forEach((item) => {
         if (targetItem) {
-          if ( targetItem.price < item.price ) {
+          if ( targetItem.price < item.price && hasMoneyFor(item) ) {
             targetItem = item
           }
         } else {
@@ -118,7 +122,8 @@ app.post('/move', (req, res, next) => {
   }
 
   // Do we have money for exiting?
-  if (targetItem.price > player.money) {
+  if (!hasMoneyFor(targetItem)) {
+    console.log("no moneys " + player.money)
     exiting = true
   }
 
