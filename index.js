@@ -21,6 +21,7 @@ let exit = {
 let player = {}
 let items = []
 let targetItem = null
+let exiting = false
 
 const finder = new pathfinding.AStarFinder()
 
@@ -41,7 +42,9 @@ app.post('/move', (req, res, next) => {
 
   for (let i = 0; i < items.length; ++i){
     let item = items[i]
-    if (item.position.x === player.position.x && item.position.y === player.position.y){
+    if (item.position.x === player.position.x &&
+        item.position.y === player.position.y &&
+        item.price <= player.money){
       res.json('PICK')
       next()
     }
@@ -114,9 +117,16 @@ app.post('/move', (req, res, next) => {
     })
   }
 
-  console.log(targetItem)
+  // Do we have money for exiting?
+  if (targetItem.price > player.money) {
+    exiting = true
+  }
 
-  path = finder.findPath(player.position.x, player.position.y, targetItem.position.x, targetItem.position.y, grid)
+  if (!exiting){
+    path = finder.findPath(player.position.x, player.position.y, targetItem.position.x, targetItem.position.y, grid)
+  } else {
+    path = finder.findPath(player.position.x, player.position.y, exit.x, exit.y, grid)
+  }
 
   let direction = {
     x: 0,
