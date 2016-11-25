@@ -8,17 +8,18 @@ const app = express()
 
 // Config server api here
 const api = apisauce.create({
+  //baseURL: 'http://192.168.1.2:8080',
   baseURL: 'http://localhost:8080',
 })
 
 let matrix = []
-
 let exit = {
   x: 0,
   y: 0
 }
-
 let player = {}
+let items = []
+
 const finder = new pathfinding.AStarFinder()
 
 app.use(morgan('dev'))
@@ -28,18 +29,21 @@ app.get('/', (req, res) => {
   res.send('hello, world!')
 })
 
-// just for debugging
-app.get('/move', (req, res) => {
-  const path = finder.findPath(1, 2, 4, 2, grid);
-  res.json(path)
-})
-
 // server posts this endpoint on every move and this should return the move
-app.post('/move', (req, res) => {
+app.post('/move', (req, res, next) => {
   matrix = []
 
   player = req.body.playerState
   exit = req.body.gameState.map.exit
+  items = req.body.gameState.items
+
+  for (let i = 0; i < items.length; ++i){
+    let item = items[i]
+    if (item.position.x === player.position.x && item.position.y === player.position.y){
+      res.json('PICK')
+      next()
+    }
+  }
 
   //console.log(req.body.gameState.map.tiles)
 
@@ -103,12 +107,13 @@ app.post('/move', (req, res) => {
 })
 
 app.listen(30003, () => {
-  console.log('Example app listening on port 30003!')
+  console.log('Bottiasia listening on port 30003!')
 })
 
 // TODO - register should post own IP
 api.post('/register', {
     playerName: "bottiasia",
+    //url: "http://192.168.1.11:30003/move"
     url: "http://localhost:30003/move"
   })
   .then(console.log)
