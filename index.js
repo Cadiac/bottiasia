@@ -63,6 +63,8 @@ app.post('/move', (req, res, next) => {
     let item = items[i]
     if (item.position.x === player.position.x &&
         item.position.y === player.position.y &&
+        targetItem.position.x === item.position.x &&
+        targetItem.position.y === item.position.y &&
         hasMoneyFor(item)){
       console.log("Picking up item at " + player.position.x + ',' + player.position.y)
       console.log("PICK")
@@ -214,7 +216,7 @@ app.listen(30003, () => {
 
 // TODO - register should post own IP
 api.post('/register', {
-    playerName: "bottiasia3",
+    playerName: "bottiasia",
     url: "http://" + ip.address() + ":30003/move"
   })
   .then(console.log)
